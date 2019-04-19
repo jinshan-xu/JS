@@ -1,4 +1,3 @@
-// import $ from 'jquery';
 
 import md5 from 'md5';
 
@@ -86,7 +85,7 @@ var validatorFunc = function (params, validatorArgs) {
     return errorMsg;
 };
 
-export default {    
+export default {
     validatorFunc: validatorFunc,
 
     getQueryStringArgs: function () {
@@ -138,7 +137,7 @@ export default {
             parts.push(item + '=' + obj[item]);
         });
 
-        var hashStrFirst = md5("/someStr" + parts.join("&"));        
+        var hashStrFirst = md5("/someStr" + parts.join("&"));
         var hashStrFirstArray = hashStrFirst.split("");
         return md5(hashStrFirstArray.join(""));
     },
@@ -290,7 +289,7 @@ export default {
         }
     },
     rem750: function (fontSize) {
-        var max = 750;        
+        var max = 750;
         if (!fontSize) {
             var width = window.innerWidth;
             width = width > max ? max : width;
@@ -298,7 +297,7 @@ export default {
             window.document.documentElement.style.fontSize = rem + 'px';
         } else {
             window.document.documentElement.style.fontSize = fontSize;
-        }        
+        }
     },
     // 获取根元素字体大小
     getRootSize: function () {
