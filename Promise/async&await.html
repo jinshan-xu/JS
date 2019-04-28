@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    /*
+      1. 验证 await 阻塞程序执行 
+    */
+    async function syn1() {
+      console.log('syn1 is run');
+      await fn();
+      console.log('syn1 is end');
+    }
+
+    function fn() {
+      console.log('fn is run');
+    }
+
+    syn1();
+    console.log('outer is run');
+    //  
+
+
+    /*
+      2. 面试题 async/await 与 promise 与 setTimeout 的执行顺序问题
+    */
+    async function async1() {
+      console.log('async1 start')
+      await async2()
+      console.log('async1 end')
+    }
+
+    async function async2() {
+      console.log('async2')
+    }
+
+    console.log('script start')
+
+    setTimeout(function () {
+      console.log('setTimeout')
+    }, 0)
+
+    async1();
+
+    new Promise(function (resolve) {
+      console.log('promise1')
+      resolve();
+    })
+    .then(function () {      
+      console.log('promise2')
+    })
+    
+    console.log('script end')
+    // 
+
+    // 测试
+    console.log('---------------');
+    let reg = /auth/;
+    let s = '/auth/role';
+    let ss = '/base/rolw'
+    console.log(reg.test(s));
+    console.log(reg.test(ss));
+  </script>
+</body>
+
+</html>

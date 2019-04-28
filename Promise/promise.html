@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>promise Demo</title>
+  <script src="./ajax-promise.js"></script>
+</head>
+<body>
+  <script>
+    /*
+      1. Promise 例-1      
+    */
+   function setTimeoutFn( ms ){
+     return new Promise(function(resolve, reject){
+       setTimeout(resolve, ms, 'done');
+     })
+   }
+   setTimeoutFn(1000).then(function(res){
+    //  console.log('结果是：',res);   // 一秒之后将会打印
+   })
+
+   /*
+      2. Promise 新建后立即执行.是因为 new Promise() 本就是实例化对象的操作，不是异步操作。
+   */
+   let promise = new Promise(function(resolve,reject){
+    //  console.log('new promise done');
+     resolve();
+   })
+   promise.then(()=>{
+    //  console.log('promise.then is run');
+   })
+  //  console.log('Hi');
+   // new promise done | Hi | promise.then is run
+
+   /*
+     3. ajax-promise 封装了简单的 ajax 请求（get）
+   */
+  let url = "https://easy-mock.com/mock/5c199bde13c0eb6355d2f040/example/name=xjs#!method=get";
+  
+  console.log('ajax(url)的结果是：');
+  console.dir(ajax(url)); 
+
+  ajax(url).then((res)=>{
+    // console.log(res);   // 成功请求后返回
+  },()=>{}) 
+
+  /*
+     4. 一个 Promise 返回另一个 Promise
+  */
+  let p1 = new Promise(function(resolve,reject){
+    setTimeout(function(){
+      reject(new Error('fail'));
+    },3000)
+  })
+
+  let p2 = new Promise(function(resolve,reject){
+    setTimeout(function(){
+      resolve(p1);  // 返回了另一个 Promise ，因此自身的状态受 p1 控制。
+    },1000);
+  })
+
+  p2.then(res=>{
+    console.log(res);   // 1s 后 p2 完成， 但是由于 p1 是 pendding, 所以 p2 将等待 p1 状态改变之后决定自身状态变化。
+  })
+  .catch(err=>{
+    // console.log(err);   // 3s 之后 p1 的状态从 pendding -> rejected, 那么 p2 的状态也变成 rejected
+  })
+
+  /*
+     5. resolve / reject 是在事件循环末尾处执行
+  */
+ new Promise((resolve, reject)=>{
+   resolve('done');  // -> 改为 return resolve("done");  可以阻止后面语句打印
+   console.log('I am also run');
+ })
+ .then(res=>{
+   // console.log(res);   // I am also run | done . 
+ });
+
+  /*
+     6. then 方法返回一个新的 Promise 实例(自动做的)
+  */
+new Promise((resolve, reject)=>{
+   resolve('done');  // -> 改为 return resolve("done");  可以阻止后面语句打印   
+ })
+ .then(res=>{
+   return res;
+ })
+ .then(res2=>{
+  //  console.log(res2);  // done
+ })
+ .then(res3=>{
+  //  console.log(res3);  // undefined
+ })
+
+ new Promise((resolve, reject)=>{
+   resolve('done');  // -> 改为 return resolve("done");  可以阻止后面语句打印   
+ })
+ .then(res=>{
+   return new Promise( function(resolve,reject){    // 可以手动返回一个 Promise 对象
+    setTimeout(() => {
+      resolve('2th promise');  
+    }, 1000);    
+   });
+ })
+ .then(res2=>{
+   console.log(res2);  // 1s 后打印 2th promise
+ })
+ .then(res3=>{
+   console.log(res3);  // undefined
+ })
+
+ /*
+  7. 
+ */
+ function red() {
+  console.log('red');
+}
+function green() {
+  console.log('green');
+}
+function yellow() {
+  console.log('yellow');
+}
+
+var light = function (timmer, cb) {
+  return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+          cb();
+          resolve();
+      }, timmer);
+  });
+};
+
+var step = function () {
+  Promise.resolve().then(function () {
+      return light(3000, red);
+  }).then(function () {
+      return light(2000, green);
+  }).then(function () {
+      return light(1000, yellow);
+  }).then(function () {
+      step();
+  });
+}
+
+// step();
+
+  </script>
+</body>
+</html>
